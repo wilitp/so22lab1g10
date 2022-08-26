@@ -14,14 +14,14 @@ static void show_prompt(void) {
 }
 
 int main(int argc, char *argv[]) {
-    pipeline pipe;
+    // pipeline pipe;
     Parser input;
     bool quit = false;
 
     input = parser_new(stdin);
     while (!quit) {
         show_prompt();
-        pipe = parse_pipeline(input);
+        // pipe = parse_pipeline(input);
 
         /* Hay que salir luego de ejecutar? */
         quit = parser_at_eof(input);
