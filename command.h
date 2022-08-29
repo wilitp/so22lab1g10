@@ -8,6 +8,7 @@
 #define COMMAND_H
 
 #include <stdbool.h> /* para tener bool */
+#include "queue.h"
 
 
 /* scommand: comando simple.
@@ -150,7 +151,7 @@ char * scommand_to_string(const scommand self);
  *           ------------------------------
  */
 
-typedef struct pipeline_s * pipeline;
+typedef queue * pipeline;
 
 /*
  * Nuevo `pipeline', sin comandos simples y establecido para que espere.
