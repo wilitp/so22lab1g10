@@ -3,9 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
 #include "command.h"
 #include "strextra.h"
+
+// TODO: implementacion de scommand
 
 struct scommand_s {
     GList *args;
@@ -157,4 +158,66 @@ char *scommand_to_string(const scommand self) {
     return output;
 }
 
-// TODO: implementacion de pipeline
+
+struct pipeline_s {
+    queue comands; 
+    bool wait;
+};
+
+pipeline pipeline_new(void) {
+
+    struct pipeline_s * new_pipe = malloc(sizeof(struct pipeline_s));
+    new_pipe->comands = queue_empty();
+    new_pipe->wait = false;
+
+    assert(new_pipe != NULL && pipeline_is_empty(new_pipe) && pipeline_get_wait(new_pipe));
+    return new_pipe;
+}
+
+pipeline pipeline_destroy(pipeline pipe){
+
+    queue_destroy(pipe->comands);
+    free(pipe);
+    pipe = NULL;
+    return pipe;
+}
+
+void pipeline_push_back(pipeline pipe, scommand scm){
+
+    queue_enqueue(pipe->comands, scm);
+}
+
+void pipeline_pop_front(pipeline pipe){
+
+    queue_dequeue(pipe->comands);
+}
+
+void pipeline_set_wait(pipeline pipe, const bool w){
+
+    pipe->wait = w;
+}
+
+bool pipeline_is_empty(const pipeline pipe){
+
+    return queue_is_empty(pipe->comands);
+}
+
+unsigned int pipeline_length(const pipeline pipe){
+    
+    return queue_size(pipe->comands);
+}
+
+scommand pipeline_front(const pipeline pipe){
+
+    return queue_first(pipe);
+}
+
+bool pipeline_get_wait(const pipeline pipe){
+
+    return pipe->wait;
+}
+
+char * pipeline_to_string(const pipeline self){
+
+    return 0;
+}

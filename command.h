@@ -153,7 +153,7 @@ scommand scommand_copy(const scommand self);
  *           ------------------------------
  */
 
-typedef queue * pipeline;
+typedef struct pipeline_s * pipeline
 
 /*
  * Nuevo `pipeline', sin comandos simples y establecido para que espere.
