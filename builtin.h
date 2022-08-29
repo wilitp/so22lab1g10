@@ -5,16 +5,15 @@
 
 #include "command.h"
 
-bool builtin_is_internal(scommand cmd);
 /*
  * Indica si el comando alojado en `cmd` es un comando interno
  *
  * REQUIRES: cmd != NULL
  *
  */
+bool builtin_is_internal(scommand cmd);
 
 
-bool builtin_alone(pipeline p);
 /*
  * Indica si el pipeline tiene solo un elemento y si este se corresponde a un
  * comando interno.
@@ -28,14 +27,15 @@ bool builtin_alone(pipeline p);
  *
  *
  */
+bool builtin_alone(pipeline p);
 
-void builtin_run(scommand cmd);
 /*
  * Ejecuta un comando interno
  *
  * REQUIRES: {builtin_is_internal(cmd)}
  *
  */
+void builtin_run(scommand cmd);
 
 #endif
 

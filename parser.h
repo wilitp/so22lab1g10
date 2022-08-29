@@ -14,7 +14,6 @@ typedef enum {
     ARG_OUTPUT  // Indicates an output redirection
 } arg_kind_t; // An auxiliary type for parser_next_argument() 
 
-Parser parser_new(FILE *input);
 /*
  * Constructor de Parser.
  * El input es el archivo de donde se quieren parsear pipelines.
@@ -24,9 +23,9 @@ Parser parser_new(FILE *input);
  *     Devuelve un Parser para el archivo
  *     o NULL en caso de haber un error de inicialización
  */
+Parser parser_new(FILE *input);
 
 
-Parser parser_destroy(Parser parser);
 /*
  * Destructor de Parser.
  * REQUIRES:
@@ -34,9 +33,9 @@ Parser parser_destroy(Parser parser);
  * ENSURES:
  *     Devuelve NULL
  */
+Parser parser_destroy(Parser parser);
 
 
-char * parser_next_argument(Parser parser, arg_kind_t *arg_type);
 /*
  * Procesa el próximo argumento e indica si corresponde a un argumento normal, o
  * si es una redirección de entrada/salida. Si se encuentra un símbolo del
@@ -66,9 +65,9 @@ char * parser_next_argument(Parser parser, arg_kind_t *arg_type);
  * ENSURES:
  *
  */
+char * parser_next_argument(Parser parser, arg_kind_t *arg_type);
 
 
-void parser_op_background(Parser parser, bool *was_op_background);
 /*
  * Intenta leer un operador de background "&" e indica si se encontró dicho
  * operador. En caso de encontrar un "&", el operador se consume en caso
@@ -86,9 +85,9 @@ void parser_op_background(Parser parser, bool *was_op_background);
  * ENSURES:
  *
  */
+void parser_op_background(Parser parser, bool *was_op_background);
 
 
-void parser_skip_blanks(Parser parser);
 /*
  * Consume todos los caracteres en blanco a continuación que hay en la entrada.
  * Detiene el procesamiento ante cualquier símbolo que no es un espacio (" ") o
@@ -103,8 +102,8 @@ void parser_skip_blanks(Parser parser);
  * ENSURES:
  *
  */
+void parser_skip_blanks(Parser parser);
 
-void parser_op_pipe(Parser parser, bool *was_op_pipe);
 /*
  * Intenta leer un operador de pipe "|" e indica si se encontró dicho
  * operador. En caso de encontrar un "|", el operador se consume en caso
@@ -122,8 +121,8 @@ void parser_op_pipe(Parser parser, bool *was_op_pipe);
  * ENSURES:
  *
  */
+void parser_op_pipe(Parser parser, bool *was_op_pipe);
 
-void parser_garbage(Parser parser, bool *garbage);
 /*
  * Consume todos los caracteres encontrados hasta un final de linea "\n" el
  * cual también se consume. Indica si se encontraron símbolos distintos de
@@ -145,8 +144,8 @@ void parser_garbage(Parser parser, bool *garbage);
  *     ! parser_at_eof (parser) && garbage != NULL
  *
  */
+void parser_garbage(Parser parser, bool *garbage);
 
-char * parser_last_garbage(Parser parser);
 /*
  * Devuelve una cadena con los símbolos leídos en la última llamada a
  * `parser_garbage()` en donde se haya encontrado basura. La cadena devuelta es
@@ -156,13 +155,14 @@ char * parser_last_garbage(Parser parser);
  *     ! parser_at_eof (parser)
  *
  */
+char * parser_last_garbage(Parser parser);
 
-bool parser_at_eof(Parser parser);
 /*
  * Consulta si el parser llegó al final del archivo.
  * REQUIRES:
  *     parser != NULL
  */
+bool parser_at_eof(Parser parser);
 
 #endif /* PARSER_H */
 
