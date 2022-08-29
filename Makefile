@@ -40,6 +40,9 @@ memtest: $(OBJECTS)
 .depend: $(SOURCES)
 	$(CC) $(CPPFLAGS) -MM $^ > $@
 
+run:
+	./$(TARGET)
+
 -include .depend
 
 .PHONY: clean all
