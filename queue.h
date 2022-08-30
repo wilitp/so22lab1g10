@@ -5,6 +5,8 @@
 
 typedef struct s_queue * queue;
 
+typedef void * (*copy_fun_t)(void *);
+
 /*
  * DESC: Creates a new instance of queue
  *
@@ -13,7 +15,7 @@ typedef struct s_queue * queue;
  * POS: {q --> queue && queue_is_empty(q)}
  *
  */
-queue queue_empty(void);
+queue queue_empty(copy_fun_t copy_fun);
 
 /*
  * DESC: Adds element 'e' to the queue 'q'
@@ -55,6 +57,8 @@ void * queue_first(queue q);
  *
  */
 queue queue_dequeue(queue q);
+
+queue queue_copy(queue q);
 
 /*
  * DESC: Destroy instance of queue, freeing all memory used by 'q'.
