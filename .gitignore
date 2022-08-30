@@ -3,5 +3,6 @@ mybash.o
 parsing.o
 mybash
 .depend
-.ccls-cache
+.ccls*
+.vscode
 
