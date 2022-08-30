@@ -132,6 +132,8 @@ char * scommand_get_redir_out(const scommand self);
  */
 char * scommand_to_string(const scommand self);
 
+scommand scommand_copy(const scommand self);
+
 
 /*
  * pipeline: tubería de comandos.

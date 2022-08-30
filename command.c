@@ -13,13 +13,30 @@ struct scommand_s {
 
 // TODO: implementacion de scommand
 
+scommand scommand_copy(const scommand self) {
+  struct scommand_s * copy = scommand_new();
+
+  if(copy->redirect_in) {
+    copy->redirect_in = strdup(self->redirect_in);
+  }
+
+  if(copy->redirect_out) {
+    copy->redirect_out = strdup(self->redirect_out);
+  }
+
+  copy->args = queue_copy(self->args);
+
+  return copy;
+
+}
+
 scommand scommand_new(void) {
     scommand cmd = malloc(sizeof(struct scommand_s));
 
     // Sin redireccion por defecto
     cmd->redirect_in = (cmd->redirect_out = NULL);
 
-    cmd->args = queue_empty();
+    cmd->args = queue_empty((void *(*)(void *))&strdup);
     return cmd;
 }
 
