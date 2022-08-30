@@ -218,7 +218,23 @@ bool pipeline_get_wait(const pipeline pipe){
     return pipe->wait;
 }
 
-char * pipeline_to_string(const pipeline self){
+char * pipeline_to_string(const pipeline pipe){
 
-    return 0;
+    *pipestr = strdup("");
+
+    unsigned int c = pipeline_length(pipe);
+    
+    while(c<=0){
+        strmerge(pipestr, scommand_to_string(g_list_index(pipe, c)))
+        
+        if(c<0 && pipe.wait == true){
+            strmerge(pipestr, " && ")
+        }
+        elseif(c<0 && pipe.wait == false){
+            strmerge(pipestr, " | ")
+        }
+        c--;
+    }
+
+    return pipestr;
 }
