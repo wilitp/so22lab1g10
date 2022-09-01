@@ -1,20 +1,20 @@
 #include <stdbool.h>
 #include <stdlib.h>
-
 #include "command.h"
 #include "parser.h"
 #include "parsing.h"
 
 static scommand parse_scommand(Parser p) {
     /* Devuelve NULL cuando hay un error de parseo */
-    if (!parser_at_eof(parser)) {
+    assert(p!=NULL);
+    if (!parser_at_eof(p)) {
         scommand cmd = scommand_new();
         arg_kind_t * type;
-        char * data;
+        char *data;
         do {
-            data = parser_skip_blanks(p);
+            parser_skip_blanks(p);
             data = parser_next_argument(p, &type);
-            switch (data) {
+            switch (* type) {
             case ARG_NORMAL:
                 scommand_push_back(cmd, data);
                 break;
