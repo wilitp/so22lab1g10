@@ -48,29 +48,33 @@ static scommand parse_scommand(Parser p, bool* is_background) {
     }
 }
 
-pipeline parse_pipeline(Parser p) {
-    // pipeline result = pipeline_new();
-    // scommand cmd = NULL;
-    // bool error = false, another_pipe=true;
-    //
-    // cmd = parse_scommand(p);
-    // error = (cmd==NULL); /* Comando inválido al empezar */
-    // while (another_pipe && !error) {
-    //     /*
-    //      * COMPLETAR
-    //      *
-    //      */
-    // }
-    /* Opcionalmente un OP_BACKGROUND al final */
-    /*
-     *
-     * COMPLETAR
-     *
-     */
+pipeline parse_pipeline(Parser parser) {
+
+    pipeline result = pipeline_new();
+    bool * is_background = false;
+    scommand cmd = parse_scommand(parser, &is_background);
+    bool error = (cmd==NULL)
+    bool another_pipe = true;
+    
+
+    while (another_pipe && !error && !is_background) {
+        pipeline_push_back(result, cmd);
+        parser_op_pipe(parser, &another_pipe)
+        if (*another_pipe) {
+            cmd = parse_scommand(parser, &is_background);
+        }
+        error = (cmd==NULL);
+    }
+    pipeline_set_wait(result, *is_background);
+    // cat asdas | grep asd | head -1                                     &                             
+    // glist    => cat asdas -> grep asd -> head -1
+    // wait     => true
+
 
     /* Tolerancia a espacios posteriores */
     /* Consumir todo lo que hay inclusive el \n */
     /* Si hubo error, hacemos cleanup */
-
-    return NULL; // MODIFICAR
+    return result; 
 }
+
+
