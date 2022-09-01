@@ -1,11 +1,13 @@
+#include <assert.h>
 #include <glib.h>
 #include <stdbool.h> /* para tener bool */
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 #include "command.h"
 #include "strextra.h"
+
+// TODO: implementacion de scommand
 
 struct scommand_s {
     GList *args;
@@ -99,14 +101,14 @@ char *scommand_front(const scommand self) {
     return (char *)g_list_first(self->args)->data;
 }
 
-char *scommand_get_redir_in(const scommand self) { 
+char *scommand_get_redir_in(const scommand self) {
     assert(self != NULL);
-    return self->redirect_in; 
+    return self->redirect_in;
 }
 
-char *scommand_get_redir_out(const scommand self) { 
+char *scommand_get_redir_out(const scommand self) {
     assert(self != NULL);
-    return self->redirect_in; 
+    return self->redirect_in;
 }
 
 char *scommand_to_string(const scommand self) {
@@ -157,4 +159,92 @@ char *scommand_to_string(const scommand self) {
     return output;
 }
 
-// TODO: implementacion de pipeline
+struct pipeline_s {
+    GList *commands;
+    bool wait;
+};
+
+pipeline pipeline_new(void) {
+
+    struct pipeline_s *new_pipe = malloc(sizeof(struct pipeline_s));
+    new_pipe->commands = NULL;
+    new_pipe->wait = true;
+
+    assert(new_pipe != NULL && pipeline_is_empty(new_pipe) &&
+           pipeline_get_wait(new_pipe));
+    return new_pipe;
+}
+
+static void free_scommand(scommand cmd) { scommand_destroy(cmd); }
+
+pipeline pipeline_destroy(pipeline pipe) {
+
+    // Liberar lista de comandos
+    g_list_free_full(pipe->commands, (GDestroyNotify)&free_scommand);
+
+    // Liberar pipe
+    free(pipe);
+    pipe = NULL;
+    return pipe;
+}
+
+void pipeline_push_back(pipeline pipe, scommand cmd) {
+
+    pipe->commands = g_list_append(pipe->commands, cmd);
+}
+
+void pipeline_pop_front(pipeline pipe) {
+
+    scommand_destroy(g_list_first(pipe->commands)->data);
+    pipe->commands = g_list_remove(pipe->commands, 0);
+}
+
+void pipeline_set_wait(pipeline pipe, const bool w) { pipe->wait = w; }
+
+unsigned int pipeline_length(const pipeline pipe) {
+
+    return g_list_length(pipe->commands);
+}
+
+bool pipeline_is_empty(const pipeline pipe) {
+
+    return (pipeline_length(pipe) != 0);
+}
+
+scommand pipeline_front(const pipeline pipe) {
+
+    return g_list_first(pipe->commands)->data;
+}
+
+bool pipeline_get_wait(const pipeline pipe) { return pipe->wait; }
+
+char *pipeline_to_string(const pipeline pipe) {
+
+    char *pipestr = strdup("");
+    char *killme;
+
+    GList *current_cmd = pipe->commands;
+
+    while (current_cmd != NULL) {
+        char *cmdstr = scommand_to_string(current_cmd->data);
+
+        killme = pipestr;
+        pipestr = strmerge(pipestr, cmdstr);
+        free(killme);
+
+        // Si no es el ultimo entonces ponemos un pipe antes del proximo
+        if(current_cmd->next != NULL) {
+            killme = pipestr;
+            pipestr = strmerge(pipestr, " | ");
+        }
+    }
+
+    // Si es background ponemos & al final
+    if (pipe->wait == false) {
+        killme = pipestr;
+        pipestr = strmerge(pipestr, " &");
+        free(killme);
+    }
+
+    return pipestr;
+}
