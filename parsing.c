@@ -1,14 +1,36 @@
-#include <stdlib.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
-#include "parsing.h"
-#include "parser.h"
 #include "command.h"
+#include "parser.h"
+#include "parsing.h"
 
-// static scommand parse_scommand(Parser p) {
-//     /* Devuelve NULL cuando hay un error de parseo */
-//     return NULL;
-// }
+static scommand parse_scommand(Parser p) {
+    /* Devuelve NULL cuando hay un error de parseo */
+    if (!parser_at_eof(parser)) {
+        scommand cmd = scommand_new();
+        arg_kind_t * type;
+        char * data;
+        do {
+            data = parser_skip_blanks(p);
+            data = parser_next_argument(p, &type);
+            switch (data) {
+            case ARG_NORMAL:
+                scommand_push_back(cmd, data);
+                break;
+            case ARG_INPUT:
+                scommand_set_redir_in(cmd, data);
+                break;
+            case ARG_OUTPUT:
+                scommand_set_redir_out(cmd, data);
+                break;
+            }
+        } while (data != NULL);
+        return cmd;
+    } else {
+        return NULL;
+    }
+}
 
 pipeline parse_pipeline(Parser p) {
     // pipeline result = pipeline_new();
@@ -36,4 +58,3 @@ pipeline parse_pipeline(Parser p) {
 
     return NULL; // MODIFICAR
 }
-
