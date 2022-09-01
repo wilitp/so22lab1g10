@@ -3,6 +3,7 @@
 #include <stdbool.h> /* para tener bool */
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "command.h"
 #include "strextra.h"
@@ -37,13 +38,19 @@ scommand scommand_new(void) {
     scommand cmd = malloc(sizeof(struct scommand_s));
 
     // Sin redireccion por defecto
-    cmd->redirect_in = (cmd->redirect_out = NULL);
+    cmd->redirect_in = NULL;
+    cmd->redirect_out = NULL;
 
     cmd->args = NULL;
+
+    assert(cmd!=NULL);
+    assert(cmd->redirect_in == NULL);
+    assert(cmd->redirect_out == NULL);
     return cmd;
 }
 
 scommand scommand_destroy(scommand self) {
+    assert(self != NULL);
     // Lista de args
     g_list_free_full(self->args, (GDestroyNotify)*free);
 
@@ -63,25 +70,29 @@ scommand scommand_destroy(scommand self) {
 }
 
 void scommand_push_back(scommand self, char *argument) {
+    assert(self != NULL);
     assert(argument != NULL);
     self->args = g_list_append(self->args, argument);
 }
 
 void scommand_pop_front(scommand self) {
+    assert(self != NULL);
     assert(g_list_length(self->args) > 0);
+
     // Free data del elemento
     free(g_list_first(self->args)->data);
 
     // Free elemento en si(nodo)
-    self->args = g_list_remove(self->args, 0);
+    self->args = g_list_delete_link(self->args, self->args);
+    
 }
 
 void scommand_set_redir_in(scommand self, char *filename) {
-    assert(filename != NULL);
+    assert(self != NULL);
     self->redirect_in = filename;
 }
 void scommand_set_redir_out(scommand self, char *filename) {
-    assert(filename != NULL);
+    assert(self != NULL);
     self->redirect_out = filename;
 }
 
@@ -108,14 +119,17 @@ char *scommand_get_redir_in(const scommand self) {
 
 char *scommand_get_redir_out(const scommand self) {
     assert(self != NULL);
-    return self->redirect_in;
+    return self->redirect_out;
 }
 
 char *scommand_to_string(const scommand self) {
     assert(self != NULL);
-    assert(g_list_length(self->args) > 0);
 
     char *output = strdup("");
+
+    if(g_list_length(self->args) == 0) {
+      return output;
+    }
     char *killme;
 
     // Argumentos
@@ -170,14 +184,17 @@ pipeline pipeline_new(void) {
     new_pipe->commands = NULL;
     new_pipe->wait = true;
 
-    assert(new_pipe != NULL && pipeline_is_empty(new_pipe) &&
-           pipeline_get_wait(new_pipe));
+    assert(new_pipe != NULL);
+    assert(pipeline_is_empty(new_pipe));
+    assert(pipeline_get_wait(new_pipe));
+
     return new_pipe;
 }
 
 static void free_scommand(scommand cmd) { scommand_destroy(cmd); }
 
 pipeline pipeline_destroy(pipeline pipe) {
+    assert(pipe != NULL);
 
     // Liberar lista de comandos
     g_list_free_full(pipe->commands, (GDestroyNotify)&free_scommand);
@@ -189,38 +206,58 @@ pipeline pipeline_destroy(pipeline pipe) {
 }
 
 void pipeline_push_back(pipeline pipe, scommand cmd) {
-
+    assert(pipe != NULL);
+    assert(cmd != NULL);
     pipe->commands = g_list_append(pipe->commands, cmd);
 }
 
 void pipeline_pop_front(pipeline pipe) {
+    assert(pipe != NULL);
+    assert(g_list_length(pipe->commands) != 0);
 
+    // Liberamos el command
     scommand_destroy(g_list_first(pipe->commands)->data);
-    pipe->commands = g_list_remove(pipe->commands, 0);
+
+    // Removemos el nodo
+    pipe->commands = g_list_delete_link(pipe->commands, pipe->commands);
 }
 
-void pipeline_set_wait(pipeline pipe, const bool w) { pipe->wait = w; }
+void pipeline_set_wait(pipeline pipe, const bool w) { 
+  assert(pipe != NULL);
+  pipe->wait = w; 
+}
 
 unsigned int pipeline_length(const pipeline pipe) {
+    assert(pipe != NULL);
 
     return g_list_length(pipe->commands);
 }
 
 bool pipeline_is_empty(const pipeline pipe) {
+    assert(pipe != NULL);
 
-    return (pipeline_length(pipe) != 0);
+    return (pipeline_length(pipe) == 0);
 }
 
 scommand pipeline_front(const pipeline pipe) {
+    assert(pipe != NULL);
+    assert(g_list_length(pipe->commands));
 
     return g_list_first(pipe->commands)->data;
 }
 
-bool pipeline_get_wait(const pipeline pipe) { return pipe->wait; }
+bool pipeline_get_wait(const pipeline pipe) { 
+    assert(pipe != NULL);
+    return pipe->wait; 
+}
 
 char *pipeline_to_string(const pipeline pipe) {
+    assert(pipe != NULL);
 
     char *pipestr = strdup("");
+    if(g_list_length(pipe->commands) == 0) {
+      return pipestr;
+    }
     char *killme;
 
     GList *current_cmd = pipe->commands;
@@ -237,6 +274,8 @@ char *pipeline_to_string(const pipeline pipe) {
             killme = pipestr;
             pipestr = strmerge(pipestr, " | ");
         }
+        
+        current_cmd = current_cmd->next;
     }
 
     // Si es background ponemos & al final
