@@ -66,6 +66,9 @@ scommand scommand_destroy(scommand self) {
         self->redirect_out = NULL;
     }
 
+    free(self);
+    self = NULL;
+
     return self;
 }
 
@@ -268,11 +271,13 @@ char *pipeline_to_string(const pipeline pipe) {
         killme = pipestr;
         pipestr = strmerge(pipestr, cmdstr);
         free(killme);
+        free(cmdstr);
 
         // Si no es el ultimo entonces ponemos un pipe antes del proximo
         if(current_cmd->next != NULL) {
             killme = pipestr;
             pipestr = strmerge(pipestr, " | ");
+            free(killme);
         }
         
         current_cmd = current_cmd->next;
