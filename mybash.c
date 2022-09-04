@@ -19,22 +19,27 @@ int main(int argc, char *argv[]) {
     bool quit = false;
 
     input = parser_new(stdin);
+    bool end_of_line;
     while (!quit) {
         show_prompt();
-        pipe = parse_pipeline(input);
-        // printf("%p", (void *)pipe);
+        do {
+            pipe = parse_pipeline(input);
+            /* Hay que salir luego de ejecutar? */
+            quit = parser_at_eof(input);
 
-        /* Hay que salir luego de ejecutar? */
-        quit = parser_at_eof(input);
+            end_of_line = pipeline_is_empty(pipe);
+            if(!end_of_line)  {
+                char *pstr = pipeline_to_string(pipe);
+                printf("%s\n", pstr);
+                free(pstr);
+            }
 
-        char *pstr = pipeline_to_string(pipe);
-        printf("%s\n", pstr);
-        free(pstr);
-
-        /*
-         * COMPLETAR
-         *
-         */
+            pipeline_destroy(pipe);
+            /*
+             * COMPLETAR
+             *
+             */
+        } while (!end_of_line);
     }
     parser_destroy(input);
     input = NULL;

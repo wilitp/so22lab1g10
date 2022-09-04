@@ -73,7 +73,7 @@ pipeline parse_pipeline(Parser parser) {
             parser_op_pipe(parser,
                            &another_pipe); // Vemos si hay otro comando pipeado
         } else {
-            another_pipe = true; // para que vuelva a leer un comando
+            another_pipe = false; // para que vuelva a leer un comando
 
             // Si el comando es vacio probablemente estemos trabados en un \n.
             // Lo consumimos.
