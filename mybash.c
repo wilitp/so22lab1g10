@@ -1,6 +1,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <limits.h>
 
 #include "builtin.h"
 #include "command.h"
@@ -9,7 +11,9 @@
 #include "parsing.h"
 
 static void show_prompt(void) {
-    printf("mybash> ");
+    char cwd[PATH_MAX];
+    getcwd(cwd, PATH_MAX);
+    printf("%s mybash>", cwd);
     fflush(stdout);
 }
 
