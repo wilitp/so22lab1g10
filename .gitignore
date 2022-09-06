@@ -5,4 +5,5 @@ mybash
 .depend
 .ccls*
 .vscode
+.gdb_history
 

@@ -39,7 +39,7 @@ Parser parser_destroy(Parser parser);
 /*
  * Procesa el próximo argumento e indica si corresponde a un argumento normal, o
  * si es una redirección de entrada/salida. Si se encuentra un símbolo del
- * operador pipe (|) o un fin de línea (\n), el procesamiento no avanza, dejando
+ * operador pipe (|) o un fin de línea ("\n"), el procesamiento no avanza, dejando
  * sin consumir dichos símbolos.
  * 
  * EJEMPLO:

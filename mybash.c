@@ -1,36 +1,47 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
+#include "builtin.h"
 #include "command.h"
 #include "execute.h"
 #include "parser.h"
 #include "parsing.h"
-#include "builtin.h"
 
 static void show_prompt(void) {
-    printf ("mybash> ");
-    fflush (stdout);
+    printf("mybash> ");
+    fflush(stdout);
 }
 
 int main(int argc, char *argv[]) {
-    // pipeline pipe;
+    pipeline pipe;
     Parser input;
     bool quit = false;
 
     input = parser_new(stdin);
+    bool end_of_line;
     while (!quit) {
         show_prompt();
-        // pipe = parse_pipeline(input);
+        do {
+            pipe = parse_pipeline(input);
+            /* Hay que salir luego de ejecutar? */
+            quit = parser_at_eof(input);
 
-        /* Hay que salir luego de ejecutar? */
-        quit = parser_at_eof(input);
-        /*
-         * COMPLETAR
-         *
-         */
+            end_of_line = pipeline_is_empty(pipe);
+            if(!end_of_line)  {
+                char *pstr = pipeline_to_string(pipe);
+                printf("%s\n", pstr);
+                free(pstr);
+            }
+
+            pipeline_destroy(pipe);
+            /*
+             * COMPLETAR
+             *
+             */
+        } while (!end_of_line);
     }
-    parser_destroy(input); input = NULL;
+    parser_destroy(input);
+    input = NULL;
     return EXIT_SUCCESS;
 }
-
