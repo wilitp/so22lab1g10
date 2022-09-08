@@ -19,6 +19,7 @@
 // }
 
 int main(int argc, char *argv[]) {
+    exit_my_bash = false;
     pipeline pipe;
     Parser input;
     bool quit = false;
@@ -46,6 +47,7 @@ int main(int argc, char *argv[]) {
              */
         } while (!end_of_line);
     }
+
     parser_destroy(input);
     input = NULL;
     return EXIT_SUCCESS;

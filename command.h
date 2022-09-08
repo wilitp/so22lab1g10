@@ -8,7 +8,6 @@
 #define COMMAND_H
 
 #include <stdbool.h> /* para tener bool */
-#include "queue.h"
 
 
 /* scommand: comando simple.
