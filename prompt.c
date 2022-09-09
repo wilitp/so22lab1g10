@@ -37,8 +37,9 @@ void show_prompt(void) {
     printf("%s:", username);
     color_blue();
     printf("%s", work_dir);
+    // printf(" 〉");
+    printf("%c ", 0x21c9);
     color_reset();
-    printf("$ »\n");
     fflush(stdout);
 }
 
