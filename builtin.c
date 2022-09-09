@@ -44,12 +44,14 @@ void builtin_run(scommand cmd) {
                 "Usage: mybash <command>\n\n");
   
     } else if (is_cd(cmd)) {
-        scommand_pop_front(cmd);    // hago bosta el 'cd'
-        chdir(scommand_front(cmd)); // lo que sigue es el path
+        scommand_pop_front(cmd);                    // hago bosta el 'cd'
+        if (chdir(scommand_front(cmd))==(-1)) {     // ejecuto el chdir y veo si hay error
+            perror("my bash");                      // si hay error, lo imprimo
+        }
 
-    } else if (is_exit(cmd)) {
-        printf("bye! -mybash");
-        exit_my_bash = true;
-    }
+    } else if (is_exit(cmd)) {      
+        printf("bye! -mybash");     
+        exit_my_bash = true;        
+    }                                
 }
 
