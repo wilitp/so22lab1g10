@@ -30,14 +30,16 @@ int main(int argc, char *argv[]) {
         show_prompt();
         do {
             pipe = parse_pipeline(input);
-            /* Hay que salir luego de ejecutar? */
-            quit = parser_at_eof(input);
 
             end_of_line = pipeline_is_empty(pipe);
             if(!end_of_line)  {
-                char *pstr = pipeline_to_string(pipe);
-                printf("%s\n", pstr);
-                free(pstr);
+                // Loguear lo parseado
+                // char *pstr = pipeline_to_string(pipe);
+                // printf("%s\n", pstr);
+                // free(pstr);
+
+                // Ejecutar el pipeline
+                execute_pipeline(pipe);
             }
 
             pipeline_destroy(pipe);
@@ -45,6 +47,8 @@ int main(int argc, char *argv[]) {
              * COMPLETAR
              *
              */
+
+            quit = parser_at_eof(input);
         } while (!end_of_line);
     }
 
