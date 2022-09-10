@@ -29,11 +29,9 @@ static char **arg_array(scommand cmd, unsigned int argc) {
 }
 
 /* Se encarga de la redireccion de input y output, ya sean
- * Tambien encarga de cerrar la salida del pipe abierto por el comando anterior.
  * SOLO DEBE LLAMARSE DESDE UN PROCESO HIJO
  */
-static void in_out_redirs(scommand cmd, unsigned long *pipe_prev,
-                          unsigned long *pipe_next) {
+static void in_out_redirs(scommand cmd, int *pipe_prev, int *pipe_next) {
 
     // Variable auxiliar para los nombres de los archivos
     char *fname_aux = NULL;
@@ -44,14 +42,11 @@ static void in_out_redirs(scommand cmd, unsigned long *pipe_prev,
         // Abrir archivo y asignar in
         in = open(fname_aux, O_RDONLY);
         if (in < 0) {
-            printf("File %s not found.\n", fname_aux);
-        }
-        else {
-            printf("File desc: %d", in);
+        } else {
             dup2(in, STDIN_FILENO);
         }
     } else if (pipe_prev) {
-        in = (int)*pipe_prev;
+        in = *pipe_prev;
         dup2(in, STDIN_FILENO);
     }
 
@@ -60,40 +55,76 @@ static void in_out_redirs(scommand cmd, unsigned long *pipe_prev,
         out = open(fname_aux, O_WRONLY | O_CREAT, 0666);
         dup2(out, STDOUT_FILENO);
     } else if (pipe_next) {
-        out = (int)*pipe_next;
+        out = *pipe_next;
         dup2(out, STDOUT_FILENO);
     }
 }
 
-void execute_pipeline(pipeline pipe) {
-    unsigned int plen = pipeline_length(pipe);
-    if (plen == 1) {
-        // Ejecutar el unico comando
-        scommand cmd = pipeline_front(pipe);
-        unsigned int argc = scommand_length(cmd);
-        char **argv = arg_array(cmd, argc);
+static int execute_command(scommand cmd, int last_pipe_out, bool is_first,
+                           bool is_last) {
+    int pipefd[2];
+    unsigned int argc = scommand_length(cmd);
+    char **argv = arg_array(cmd, argc);
 
-        int cpid;
+    int cpid;
 
-        // Hijo
-        if (0 == (cpid = fork())) {
-            in_out_redirs(cmd, NULL, NULL);
-            if (strcmp(argv[0], "cd") == 0) { // No anda esto
-                chdir(argv[1]);
-                exit(0);
-            } else if (execvp(argv[0], argv) < 0) {
-                argv = free_arg_array(argv, argc);
-                exit(1);
-            }
-            argv = free_arg_array(argv, argc);
-
-            // Padre
-        } else {
-            if (pipeline_get_wait(pipe)) {
-                wait(NULL);
-            }
-        }
-    } else {
+    // Si no es el ultimo, creamos una pipe
+    if (!is_last && pipe(pipefd) < 0) {
         exit(1);
     }
+
+    // Hijo
+    if (0 == (cpid = fork())) {
+
+        // Redireccion
+        in_out_redirs(cmd, !is_first ? &last_pipe_out : NULL,
+                      !is_last ? &pipefd[1] : NULL);
+
+        // Ejecutar comando
+        if (execvp(argv[0], argv) < 0) {
+            // Manejar errores al ejecutar
+            fprintf(stderr, "Command not found: %s\n", argv[0]);
+            argv = free_arg_array(argv, argc);
+            exit(1);
+        }
+        argv = free_arg_array(argv, argc);
+
+        // Padre
+    } else {
+
+        /* Cerrar los archivos de escritura del comando anterior
+         * y el lado de escritura de nuestra pipe si es necesario
+         * (El proceso padre no los usa)
+         */
+        if (!is_first) {
+            close(last_pipe_out);
+        }
+        if (!is_last) {
+            close(pipefd[1]);
+        }
+        wait(NULL);
+    }
+    return pipefd[0];
+}
+
+void execute_pipeline(pipeline apipe) {
+
+    // El fd de lectura del pipe abierto para el comando anterior
+    int last_pipe_out;
+
+    bool is_first = true;
+
+    unsigned int plen = pipeline_length(apipe);
+
+    do {
+        scommand cmd = pipeline_front(apipe);
+
+        // Ejecutar el comando y guardar la salida pipeada
+        last_pipe_out =
+            execute_command(cmd, last_pipe_out, is_first, plen == 1);
+
+        pipeline_pop_front(apipe);
+        --plen;
+        is_first = false;
+    } while (pipeline_length(apipe));
 }
