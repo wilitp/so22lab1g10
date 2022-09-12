@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h> 
 #include <string.h>     // strcmp
 #include <stdbool.h>    // true, false 
@@ -8,15 +9,15 @@
 #include "builtin.h"
 
 
-bool is_cd(scommand cmd) {
+static bool is_cd(scommand cmd) {
     return (strcmp(scommand_front(cmd), "cd")==0);
 }
 
-bool is_exit(scommand cmd) {
+static bool is_exit(scommand cmd) {
     return (strcmp(scommand_front(cmd), "exit")==0);
 }
 
-bool is_help(scommand cmd) {
+static bool is_help(scommand cmd) {
     return (strcmp(scommand_front(cmd), "help")==0);
 }
 
@@ -51,7 +52,7 @@ void builtin_run(scommand cmd) {
 
     } else if (is_exit(cmd)) {      
         printf("bye! -mybash");     
-        exit_my_bash = true;        
+        exit(EXIT_SUCCESS);
     }                                
 }
 

@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <wait.h>
 
+#include "builtin.h"
 #include "execute.h"
 
 static char **free_arg_array(char **arr, unsigned int argc) {
@@ -63,8 +64,6 @@ static void in_out_redirs(scommand cmd, int *pipe_prev, int *pipe_next) {
 static int execute_command(scommand cmd, int last_pipe_out, bool is_first,
                            bool is_last) {
     int pipefd[2];
-    unsigned int argc = scommand_length(cmd);
-    char **argv = arg_array(cmd, argc);
 
     int cpid;
 
@@ -74,6 +73,7 @@ static int execute_command(scommand cmd, int last_pipe_out, bool is_first,
     }
 
     // Hijo
+
     if (0 == (cpid = fork())) {
 
         // Redireccion
@@ -81,13 +81,21 @@ static int execute_command(scommand cmd, int last_pipe_out, bool is_first,
                       !is_last ? &pipefd[1] : NULL);
 
         // Ejecutar comando
-        if (execvp(argv[0], argv) < 0) {
-            // Manejar errores al ejecutar
-            fprintf(stderr, "Command not found: %s\n", argv[0]);
+        if(builtin_is_internal(cmd)) {
+            builtin_run(cmd);
+
+        } else {
+            unsigned int argc = scommand_length(cmd);
+            char **argv = arg_array(cmd, argc);
+            if (execvp(argv[0], argv) < 0) {
+                // Manejar errores al ejecutar
+                fprintf(stderr, "Command not found: %s\n", argv[0]);
+                argv = free_arg_array(argv, argc);
+                exit(1);
+            }
             argv = free_arg_array(argv, argc);
-            exit(1);
         }
-        argv = free_arg_array(argv, argc);
+
 
         // Padre
     } else {
@@ -115,16 +123,19 @@ void execute_pipeline(pipeline apipe) {
     bool is_first = true;
 
     unsigned int plen = pipeline_length(apipe);
+    if (builtin_alone(apipe)) {
+        builtin_run(pipeline_front(apipe));
+    } else {
+        do {
+            scommand cmd = pipeline_front(apipe);
 
-    do {
-        scommand cmd = pipeline_front(apipe);
+            // Ejecutar el comando y guardar la salida pipeada
+            last_pipe_out =
+                execute_command(cmd, last_pipe_out, is_first, plen == 1);
 
-        // Ejecutar el comando y guardar la salida pipeada
-        last_pipe_out =
-            execute_command(cmd, last_pipe_out, is_first, plen == 1);
-
-        pipeline_pop_front(apipe);
-        --plen;
-        is_first = false;
-    } while (pipeline_length(apipe));
+            pipeline_pop_front(apipe);
+            --plen;
+            is_first = false;
+        } while (pipeline_length(apipe));
+    }
 }

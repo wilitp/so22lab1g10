@@ -5,8 +5,6 @@
 
 #include "command.h"
 
-bool exit_my_bash;
-
 /*
  * Indica si el comando alojado en `cmd` es un comando interno
  *
