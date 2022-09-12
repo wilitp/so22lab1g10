@@ -83,7 +83,7 @@ static int execute_command(scommand cmd, int last_pipe_out, bool is_first,
         // Ejecutar comando
         if(builtin_is_internal(cmd)) {
             builtin_run(cmd);
-
+            exit(EXIT_SUCCESS);
         } else {
             unsigned int argc = scommand_length(cmd);
             char **argv = arg_array(cmd, argc);
