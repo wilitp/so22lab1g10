@@ -1,0 +1,21 @@
+*{
+  font-family: monospace;
+  background-color: rgb(255, 238, 224)
+}
+
+h1{
+  color: red;
+  animation: mymove 3s infinite;
+}
+
+@keyframes mymove {
+  from {
+      color: grey;
+  }
+  50% {
+      color: black; 
+  }
+  to {
+      color: grey;
+  }
+}
