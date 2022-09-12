@@ -5,21 +5,12 @@
 #include <limits.h>
 
 #include "prompt.h"
-#include "builtin.h"
 #include "command.h"
 #include "execute.h"
 #include "parser.h"
 #include "parsing.h"
 
-// static void show_prompt(void) {
-//     char cwd[PATH_MAX];
-//     getcwd(cwd, PATH_MAX);
-//     printf("%s mybash>", cwd);
-//     fflush(stdout);
-// }
-
 int main(int argc, char *argv[]) {
-    exit_my_bash = false;
     pipeline pipe;
     Parser input;
     bool quit = false;
@@ -30,14 +21,16 @@ int main(int argc, char *argv[]) {
         show_prompt();
         do {
             pipe = parse_pipeline(input);
-            /* Hay que salir luego de ejecutar? */
-            quit = parser_at_eof(input);
 
             end_of_line = pipeline_is_empty(pipe);
             if(!end_of_line)  {
-                char *pstr = pipeline_to_string(pipe);
-                printf("%s\n", pstr);
-                free(pstr);
+                // Loguear lo parseado
+                // char *pstr = pipeline_to_string(pipe);
+                // printf("%s\n", pstr);
+                // free(pstr);
+
+                // Ejecutar el pipeline
+                execute_pipeline(pipe);
             }
 
             pipeline_destroy(pipe);
@@ -45,6 +38,8 @@ int main(int argc, char *argv[]) {
              * COMPLETAR
              *
              */
+
+            quit = parser_at_eof(input);
         } while (!end_of_line);
     }
 
