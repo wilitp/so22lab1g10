@@ -1,169 +1,76 @@
-<style type="text/css">
+# Grupo 10 
 
-    blockquote {
-        border-left: 3px solid #01ff70 !important;
-        padding-left: 1rem !important;
-        background-color: #333 !important;
+#### Laboratorio #01
 
-    }
 
-    ul li::before {
-        content: "\2022";
-        color: #01ff70;
-        font-weight: bold;
-        display: inline-block; 
-        width: 1em;
-        margin-left: -1em;
-    }
+* De Ipola Guillermo 🐋 
+* Molina Franco 😶‍🌫️ 
+* Ebner Lautaro 🚙 
+* Ludueña Zakka Juan Pablo 🖨️
 
-    h1{
-        animation: mymove 3s infinite;
-    }
 
-    h2{
-        color: #01ff70 !important;
-    }
-
-    h4{
-        color: #01ff70 !important;
-    }
-
-    summary{
-        animation: mymove 5s infinite;
-        font-weight: bold;        
-    }
-
-    a{
-        text-decoration: underline !important;
-        color: #01ff70 !important;
-    }
-    
-    *{
-        font-family: "Courier New";
-        background-color: #333;
-        color: #fafafa !important;
-    }
-
-    @keyframes mymove {
-        from {
-            text-shadow: 0 0px 2px, 0 0 1em #01ff70, 0 0 0.2em #01ff70, 0 0 0.1em #01ff70;
-            color: white;
-        }
-        50% {
-            text-shadow: 0 0px 2px, 0 0 1em #333, 0 0 0.2em #333, 0 0 0.1em #333;
-            color: white; 
-        }
-        to {
-            text-shadow: 0 0px 2px, 0 0 1em #01ff70, 0 0 0.2em #01ff70, 0 0 0.1em #01ff70;
-            color: white;
-        }
-    }
-</style>
-
-<h1> Grupo 10 </h1>
-
-<blockquote>
-
-Laboratorio #01
-
-</blockquote>
-
-<ul>
-    <li> De Ipola Guillermo 🐋 </li>
-    <li> Molina Franco 😶‍🌫️ </li>
-    <li> Ebner Lautaro 🚙 </li>
-    <li> Ludueña Zakka Juan Pablo 🖨️ </li>
-</ul>
-
-<details>
-    <summary> Cómo compilar su código</summary>
-    <br>
+<br>
+<h4 id="comp">Cómo compilar y correr el código</h4> 
 
 Para compilar el codigo y crear un ejecutable con nombre mybash 
 
-<blockquote>
-$ make
-</blockquote>
+>       $ make
+
 
 Para borrar los archivos objets y el ejecutable
 
-<blockquote>
-$ make clean
-</blockquote>
+>       $ make clean
+
 
 Para correr el programa se puede ejecutar
 
-<blockquote>
-$ make run
-</blockquote>
+>       $ make run
 
-ó podemos llamar al ejecutables directamente
 
-<blockquote>
-$ ./mybash
-</blockquote>
-    
-</details>
+ó podemos llamar al ejecutables directamente, luego de haber [compilado](#comp)
 
-<details>
-    <summary> Debugger</summary>
-    <br>
+>       $ ./mybash
+
+
+<br>
+#### Debugger
 
 Para debuggear el sistema lo haremos con la erramienta valgrind a travez del comando
 
-<blockquote>
-$ make debugger
-</blockquote>
+>       $ make debugger
 
-ó directamente corriendo ejecutando el valgrind
 
-<blockquote>
-$ make
-$ valgrind ./mybash
-</blockquote>
+ó directamente corriendo ejecutando el valgrind, luego de haber [compilado](#comp)
 
-</details>
+>       $ valgrind ./mybash
 
-<details>
-    <summary> Listar los comandos que ustedes probaron:</summary>
-    <br>
+
+
+
+<br>
+####  Listar los comandos que ustedes probaron:
 
 <blockquote>
-    <t> $ ls -l | grep -v </t>
-    <t> $ ls -l | wc -l > prueba.txt </t>
-    <t> $ errorerror </t>
-    <t> $ exit </t>
+
+    $ ls -l | grep -v
+    $ ls -l | wc -l > prueba.txt 
+    $ errorerror 
+    $ exit 
+
 </blockquote>
 
-</details>
-
-<details>
-    <summary> Decisiones de implementación:</summary>
-    <br>
-
-</details>
-
-<details>
-    <summary> Items relevante:</summary>
-    <br>
-
-</details>
-
-<details>
-    <summary> Extra: nuestra forma de trabajar</summary>
-    <br>
 
 
-<li> Manejamos un sistema de  control de verciones: <a href="https://bitbucket.org/">Bitbucket</a> </li>
-<li> Nos manejamos a travez de ramas (branchs) propias de cada tarea por hacer (normalmente distribuidas por archivos) </li>
-<li> Comunicación: <a href="https://discord.com">Discord<a> y <a href="https://app.clickup.com">ClickUp</a></li>
+<br>
+####  Decisiones de implementación:
 
-</details>
+<br>
+####  Items relevante:
 
+<br>
+####  Extra: nuestra forma de trabajar
 
-
-
-
-
-
+- [ ] Manejamos un sistema de control de verciones: [Bitbucket](https://bitbucket.org/)
+- [ ] Nos manejamos a travez de ramas (branchs) propias de cada tarea por hacer (normalmente distribuidas por archivos)
+- [ ] Comunicación: [Discord](https://discord.com) y [ClickUp](https://app.clickup.com) 
 
