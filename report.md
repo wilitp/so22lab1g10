@@ -1,4 +1,4 @@
-# Grupo 10
+<h1> Grupo 10 </h1>
 
 <blockquote>
 
@@ -6,17 +6,18 @@ Laboratorio #01
 
 </blockquote>
 
-
-- De Ipola Guillermo 🐋
-- Molina Franco 😶‍🌫️
-- Ebner Lautaro 🚙
-- Ludueña Zakka Juan Pablo 🖨️
+<ul>
+    <li> De Ipola Guillermo 🐋 </li>
+    <li> Molina Franco 😶‍🌫️ </li>
+    <li> Ebner Lautaro 🚙 </li>
+    <li> Ludueña Zakka Juan Pablo 🖨️ </li>
+</ul>
 
 <details>
     <summary> Cómo compilar su código</summary>
     <br>
 
-Para compilar el codigo y crear un ejecutable con nombre mybash
+Para compilar el codigo y crear un ejecutable con nombre mybash 
 
 <blockquote>
 $ make
@@ -66,10 +67,10 @@ $ valgrind ./mybash
     <br>
 
 <blockquote>
-$ ls -l | grep -v
-$ ls -l | wc -l > prueba.txt
-$ errorerror
-$ exit
+    <t> $ ls -l | grep -v </t>
+    <t> $ ls -l | wc -l > prueba.txt </t>
+    <t> $ errorerror </t>
+    <t> $ exit </t>
 </blockquote>
 
 </details>
@@ -91,9 +92,9 @@ $ exit
     <br>
 
 
-- Manejamos un sistema de  control de verciones: [Bitbucket](https://bitbucket.org/)
-- Nos manejamos a travez de ramas (branchs) propias de cada tarea por hacer (normalmente distribuidas por archivos) 
-- Comunicación: [Discord](https://discord.com) y [ClickUp](https://app.clickup.com)
+<li> Manejamos un sistema de  control de verciones: [Bitbucket](https://bitbucket.org/) </li>
+<li> Nos manejamos a travez de ramas (branchs) propias de cada tarea por hacer (normalmente distribuidas por archivos) </li>
+<li> Comunicación: [Discord](https://discord.com) y [ClickUp](https://app.clickup.com) </li>
 
 </details>
 
