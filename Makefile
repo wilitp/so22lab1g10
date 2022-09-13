@@ -43,6 +43,10 @@ memtest: $(OBJECTS)
 run:
 	./$(TARGET)
 
+debugger:
+	make
+	valgrind ./$(TARGET)
+
 -include .depend
 
 .PHONY: clean all
