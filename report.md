@@ -18,19 +18,28 @@ Laboratorio #01
 
 Para compilar el codigo y crear un ejecutable con nombre mybash
 
-    $ make
+<blockquote>
+$ make
+</blockquote>
 
 Para borrar los archivos objets y el ejecutable
 
-    $ make clean
+<blockquote>
+$ make clean
+</blockquote>
 
 Para correr el programa se puede ejecutar
 
-    $ make run
+<blockquote>
+$ make run
+</blockquote>
 
 ó podemos llamar al ejecutables directamente
 
-    $ ./mybash
+<blockquote>
+$ ./mybash
+</blockquote>
+    
 </details>
 
 <details>
@@ -39,12 +48,16 @@ Para correr el programa se puede ejecutar
 
 Para debuggear el sistema lo haremos con la erramienta valgrind a travez del comando
 
-    $ make debugger
+<blockquote>
+$ make debugger
+</blockquote>
 
 ó directamente corriendo ejecutando el valgrind
 
-    $ make
-    $ valgrind ./mybash
+<blockquote>
+$ make
+$ valgrind ./mybash
+</blockquote>
 
 </details>
 
@@ -52,12 +65,13 @@ Para debuggear el sistema lo haremos con la erramienta valgrind a travez del com
     <summary> Listar los comandos que ustedes probaron:</summary>
     <br>
 
-```c
+<blockquote>
 $ ls -l | grep -v
 $ ls -l | wc -l > prueba.txt
 $ errorerror
 $ exit
-```
+</blockquote>
+
 </details>
 
 <details>
@@ -120,7 +134,7 @@ $ exit
     }
 
     summary{
-        animation: mymove 3s infinite;
+        animation: mymove 5s infinite;
         font-weight: bold;        
     }
 
@@ -132,18 +146,21 @@ $ exit
     *{
         font-family: "Courier New";
         background-color: #333;
-        color: #fafafa;
+        color: #fafafa !important;
     }
 
     @keyframes mymove {
         from {
-            color: #01ff70;
+            text-shadow: 0 0px 2px, 0 0 1em #01ff70, 0 0 0.2em #01ff70, 0 0 0.1em #01ff70;
+            color: white;
         }
         50% {
-          color: white; 
+            text-shadow: 0 0px 2px, 0 0 1em #333, 0 0 0.2em #333, 0 0 0.1em #333;
+            color: white; 
         }
         to {
-          color: #01ff70;
+            text-shadow: 0 0px 2px, 0 0 1em #01ff70, 0 0 0.2em #01ff70, 0 0 0.1em #01ff70;
+            color: white;
         }
     }
 </style>
