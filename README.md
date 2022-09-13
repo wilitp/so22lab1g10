@@ -1,4 +1,4 @@
-<style>
+<style type="text/css">
 
     blockquote {
         border-left: 3px solid #01ff70 !important;
