@@ -109,8 +109,9 @@ static int execute_command(scommand cmd, int last_pipe_out, bool is_first,
         }
         if (!is_last) {
             close(pipefd[1]);
+        } else {
+            waitpid(cpid, NULL, 0);
         }
-        wait(NULL);
     }
     return pipefd[0];
 }
