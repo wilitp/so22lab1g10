@@ -15,7 +15,7 @@
  * 'is_background' indica si se encontro un ampersand (&), lo consume
  *  y retorna lo parseado hasta ese punto.
  */
-static scommand parse_scommand(Parser parser, bool *is_background) {
+static scommand parse_scommand(Parser parser, bool *is_background, bool * is_pipe) {
     /* Devuelve NULL cuando hay un error de parseo */
     assert(parser != NULL);
     if (parser_at_eof(parser)) {
@@ -30,7 +30,8 @@ static scommand parse_scommand(Parser parser, bool *is_background) {
             break;
         }
         parser_op_background(parser, is_background);
-        if (!(*is_background) && !parser_at_eof(parser)) {
+        parser_op_pipe(parser, is_pipe);
+        if (!(*is_background) && !(*is_pipe) && !parser_at_eof(parser)) {
             data = parser_next_argument(
                 parser, &type); // consume todo hasta el proximo espacio (" ")
             if (data != NULL) {
@@ -47,7 +48,7 @@ static scommand parse_scommand(Parser parser, bool *is_background) {
                 }
             }
         }
-    } while ((data != NULL) && !(*is_background) && !parser_at_eof(parser));
+    } while ((data != NULL) && !(*is_background) && !(*is_pipe) && !parser_at_eof(parser));
     return cmd;
 }
 
@@ -55,12 +56,12 @@ pipeline parse_pipeline(Parser parser) {
 
     pipeline result = pipeline_new();
     bool is_background = false;
-    bool another_pipe;
+    bool another_command = false;
     bool error;
 
     do {
         // Leemos un comando
-        scommand cmd = parse_scommand(parser, &is_background);
+        scommand cmd = parse_scommand(parser, &is_background, &another_command);
         error = (cmd == NULL);
         if(error){
             break;
@@ -70,21 +71,9 @@ pipeline parse_pipeline(Parser parser) {
             // Si el comando no es vacio lo agregamos
             pipeline_push_back(result, cmd);
             parser_skip_blanks(parser);
-            parser_op_pipe(parser,
-                           &another_pipe); // Vemos si hay otro comando pipeado
-        } else {
-            another_pipe = false; // para que vuelva a leer un comando
+        } 
+    } while (another_command);
 
-            // Si el comando es vacio probablemente estemos trabados en un \n.
-            // Lo consumimos.
-            bool garbage = false;
-            parser_garbage(parser, &garbage);
-            if (garbage) {
-                printf("wtf la garbage era: %s\n", parser_last_garbage(parser));
-                exit(1);
-            }
-        }
-    } while (another_pipe && !is_background);
 
     pipeline_set_wait(result, !is_background);
 

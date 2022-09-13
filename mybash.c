@@ -1,16 +1,18 @@
+#include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <limits.h>
+#include <wait.h>
 
-#include "prompt.h"
 #include "command.h"
 #include "execute.h"
 #include "parser.h"
 #include "parsing.h"
+#include "prompt.h"
 
 int main(int argc, char *argv[]) {
+
     pipeline pipe;
     Parser input;
     bool quit = false;
@@ -23,21 +25,39 @@ int main(int argc, char *argv[]) {
             pipe = parse_pipeline(input);
 
             end_of_line = pipeline_is_empty(pipe);
-            if(!end_of_line)  {
+            if (!end_of_line) {
                 // Loguear lo parseado
                 // char *pstr = pipeline_to_string(pipe);
                 // printf("%s\n", pstr);
                 // free(pstr);
 
                 // Ejecutar el pipeline
-                execute_pipeline(pipe);
+
+                int cpid;
+                if ((cpid = fork()) == 0) {
+                    execute_pipeline(pipe);
+                    exit(EXIT_SUCCESS);
+                } else if (pipeline_get_wait(pipe)) {
+                    // Esperar al padre
+                    waitpid(cpid, NULL, 0);
+
+                    // Limpiar a todos los hijos(pipelines que hayamos corrido en background)
+                    while(waitpid(-1, NULL, WNOHANG) > 0);
+                }
+
+            } else {
+
+                // Limpio el \n al final
+                bool garbage = false;
+                parser_garbage(input, &garbage);
+                if (garbage) {
+                    printf("Error: %s\n",
+                           parser_last_garbage(input));
+                    exit(1);
+                }
             }
 
             pipeline_destroy(pipe);
-            /*
-             * COMPLETAR
-             *
-             */
 
             quit = parser_at_eof(input);
         } while (!end_of_line);
