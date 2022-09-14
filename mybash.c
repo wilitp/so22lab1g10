@@ -11,6 +11,16 @@
 #include "parsing.h"
 #include "prompt.h"
 
+static void clean_garbage(Parser parser, bool must_be_clean) {
+
+    bool garbage = false;
+    parser_garbage(parser, &garbage);
+    if (garbage && must_be_clean) {
+        printf("Error: %s\n", parser_last_garbage(parser));
+        exit(1);
+    }
+}
+
 int main(int argc, char *argv[]) {
 
     pipeline pipe;
@@ -23,41 +33,43 @@ int main(int argc, char *argv[]) {
         show_prompt();
         do {
             pipe = parse_pipeline(input);
+            if (pipe != NULL) {
+                if (!(end_of_line = pipeline_is_empty(pipe))) {
+                    // Loguear lo parseado
+                    // char *pstr = pipeline_to_string(pipe);
+                    // printf("%s\n", pstr);
+                    // free(pstr);
 
-            end_of_line = pipeline_is_empty(pipe);
-            if (!end_of_line) {
-                // Loguear lo parseado
-                // char *pstr = pipeline_to_string(pipe);
-                // printf("%s\n", pstr);
-                // free(pstr);
+                    // Ejecutar el pipeline
 
-                // Ejecutar el pipeline
+                    int cpid;
+                    if ((cpid = fork()) == 0) {
 
-                int cpid;
-                if ((cpid = fork()) == 0) {
-                    execute_pipeline(pipe);
-                    exit(EXIT_SUCCESS);
-                } else if (pipeline_get_wait(pipe)) {
-                    // Esperar al padre
-                    waitpid(cpid, NULL, 0);
+                        // Ejecutar el pipeline y terminar el proceso hijo
+                        execute_pipeline(pipe);
+                        exit(EXIT_SUCCESS);
+                    } else if (pipeline_get_wait(pipe)) {
+                        // Esperar la ejecucion del pipeline
+                        waitpid(cpid, NULL, 0);
 
-                    // Limpiar a todos los hijos(pipelines que hayamos corrido en background)
-                    while(waitpid(-1, NULL, WNOHANG) > 0);
+                        // Limpiar a todos los hijos(pipelines que hayamos
+                        // corrido en background)
+                        while (waitpid(-1, NULL, WNOHANG) > 0)
+                            ;
+                    }
+
+                } else {
+
+                    // Limpio el \n al final
+                    clean_garbage(input, true);
                 }
 
+                pipeline_destroy(pipe);
             } else {
-
-                // Limpio el \n al final
-                bool garbage = false;
-                parser_garbage(input, &garbage);
-                if (garbage) {
-                    printf("Error: %s\n",
-                           parser_last_garbage(input));
-                    exit(1);
-                }
+                // Limpio toda la linea que dio error de parseo
+                clean_garbage(input, false);
+                end_of_line = true;
             }
-
-            pipeline_destroy(pipe);
 
             quit = parser_at_eof(input);
         } while (!end_of_line);
