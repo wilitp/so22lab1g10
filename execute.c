@@ -81,7 +81,7 @@ static int execute_command(scommand cmd, int last_pipe_out, bool is_first,
                       !is_last ? &pipefd[1] : NULL);
 
         // Ejecutar comando
-        if(builtin_is_internal(cmd)) {
+        if (builtin_is_internal(cmd)) {
             builtin_run(cmd);
             exit(EXIT_SUCCESS);
         } else {
@@ -95,7 +95,6 @@ static int execute_command(scommand cmd, int last_pipe_out, bool is_first,
             }
             argv = free_arg_array(argv, argc);
         }
-
 
         // Padre
     } else {
@@ -124,19 +123,15 @@ void execute_pipeline(pipeline apipe) {
     bool is_first = true;
 
     unsigned int plen = pipeline_length(apipe);
-    if (builtin_alone(apipe)) {
-        builtin_run(pipeline_front(apipe));
-    } else {
-        do {
-            scommand cmd = pipeline_front(apipe);
+    do {
+        scommand cmd = pipeline_front(apipe);
 
-            // Ejecutar el comando y guardar la salida pipeada
-            last_pipe_out =
-                execute_command(cmd, last_pipe_out, is_first, plen == 1);
+        // Ejecutar el comando y guardar la salida pipeada
+        last_pipe_out =
+            execute_command(cmd, last_pipe_out, is_first, plen == 1);
 
-            pipeline_pop_front(apipe);
-            --plen;
-            is_first = false;
-        } while (pipeline_length(apipe));
-    }
+        pipeline_pop_front(apipe);
+        --plen;
+        is_first = false;
+    } while (pipeline_length(apipe));
 }

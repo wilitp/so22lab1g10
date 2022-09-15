@@ -7,6 +7,7 @@
 
 #include "command.h"
 #include "execute.h"
+#include "builtin.h"
 #include "parser.h"
 #include "parsing.h"
 #include "prompt.h"
@@ -42,21 +43,28 @@ int main(int argc, char *argv[]) {
 
                     // Ejecutar el pipeline
 
-                    int cpid;
-                    if ((cpid = fork()) == 0) {
+                    if(builtin_alone(pipe)) {
+                        builtin_run(pipeline_front(pipe));
 
-                        // Ejecutar el pipeline y terminar el proceso hijo
-                        execute_pipeline(pipe);
-                        exit(EXIT_SUCCESS);
-                    } else if (pipeline_get_wait(pipe)) {
-                        // Esperar la ejecucion del pipeline
-                        waitpid(cpid, NULL, 0);
+                    } else {
+                        int cpid;
+                        if ((cpid = fork()) == 0) {
 
-                        // Limpiar a todos los hijos(pipelines que hayamos
-                        // corrido en background)
-                        while (waitpid(-1, NULL, WNOHANG) > 0)
-                            ;
+                            // Ejecutar el pipeline y terminar el proceso hijo
+                            execute_pipeline(pipe);
+                            exit(EXIT_SUCCESS);
+                        } else if (pipeline_get_wait(pipe)) {
+                            // Esperar la ejecucion del pipeline
+                            waitpid(cpid, NULL, 0);
+
+                            // Limpiar a todos los hijos(pipelines que hayamos
+                            // corrido en background)
+                            while (waitpid(-1, NULL, WNOHANG) > 0)
+                                ;
+                        }
+                        
                     }
+
 
                 } else {
 
