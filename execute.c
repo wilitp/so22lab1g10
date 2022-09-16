@@ -109,8 +109,6 @@ static int execute_command(scommand cmd, int last_pipe_out, bool is_first,
         }
         if (!is_last) {
             close(pipefd[1]);
-        } else {
-            waitpid(cpid, NULL, 0);
         }
     }
     return pipefd[0];
@@ -135,4 +133,5 @@ void execute_pipeline(pipeline apipe) {
         --plen;
         is_first = false;
     } while (pipeline_length(apipe));
+    while(waitpid(-1, NULL, 0) > 0);
 }

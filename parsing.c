@@ -87,6 +87,8 @@ pipeline parse_pipeline(Parser parser) {
             // Si el comando no es vacio lo agregamos
             pipeline_push_back(result, cmd);
             parser_skip_blanks(parser);
+        } else {
+            scommand_destroy(cmd);
         } 
     } while (another_command);
 

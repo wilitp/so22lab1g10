@@ -4,10 +4,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <wait.h>
+#include <assert.h>
 
+#include "builtin.h"
 #include "command.h"
 #include "execute.h"
-#include "builtin.h"
 #include "parser.h"
 #include "parsing.h"
 #include "prompt.h"
@@ -43,7 +44,7 @@ int main(int argc, char *argv[]) {
 
                     // Ejecutar el pipeline
 
-                    if(builtin_alone(pipe)) {
+                    if (builtin_alone(pipe)) {
                         builtin_run(pipeline_front(pipe));
 
                     } else {
@@ -52,6 +53,7 @@ int main(int argc, char *argv[]) {
 
                             // Ejecutar el pipeline y terminar el proceso hijo
                             execute_pipeline(pipe);
+                            pipeline_destroy(pipe);
                             exit(EXIT_SUCCESS);
                         } else if (pipeline_get_wait(pipe)) {
                             // Esperar la ejecucion del pipeline
@@ -62,9 +64,7 @@ int main(int argc, char *argv[]) {
                             while (waitpid(-1, NULL, WNOHANG) > 0)
                                 ;
                         }
-                        
                     }
-
 
                 } else {
 
