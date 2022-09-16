@@ -13,15 +13,6 @@
 #include "parsing.h"
 #include "prompt.h"
 
-static void clean_garbage(Parser parser, bool must_be_clean) {
-
-    bool garbage = false;
-    parser_garbage(parser, &garbage);
-    if (garbage && must_be_clean) {
-        printf("Error: %s\n", parser_last_garbage(parser));
-        exit(1);
-    }
-}
 
 int main(int argc, char *argv[]) {
 
@@ -66,16 +57,10 @@ int main(int argc, char *argv[]) {
                         }
                     }
 
-                } else {
-
-                    // Limpio el \n al final
-                    clean_garbage(input, true);
                 }
 
                 pipeline_destroy(pipe);
             } else {
-                // Limpio toda la linea que dio error de parseo
-                clean_garbage(input, false);
                 end_of_line = true;
             }
 

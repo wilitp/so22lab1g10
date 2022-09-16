@@ -78,6 +78,8 @@ pipeline parse_pipeline(Parser parser) {
         error = (cmd == NULL);
         if(error){
             pipeline_destroy(result);
+            // Limpio toda la linea que dio error de parseo
+            clean_garbage(parser, false);
             return NULL;
         } else {
             is_background = cmd_bg;
@@ -96,5 +98,19 @@ pipeline parse_pipeline(Parser parser) {
 
     pipeline_set_wait(result, !is_background);
 
+    if(pipeline_is_empty(result)) {
+        clean_garbage(parser, true); 
+    }
+
     return result;
+}
+
+void clean_garbage(Parser parser, bool must_be_clean) {
+
+    bool garbage = false;
+    parser_garbage(parser, &garbage);
+    if (garbage && must_be_clean) {
+        printf("Error: %s\n", parser_last_garbage(parser));
+        exit(1);
+    }
 }

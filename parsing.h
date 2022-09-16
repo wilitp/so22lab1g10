@@ -20,4 +20,6 @@
  */
 pipeline parse_pipeline(Parser parser);
 
+void clean_garbage(Parser parser, bool must_be_clean);
+
 #endif
