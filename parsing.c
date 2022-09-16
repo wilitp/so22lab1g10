@@ -40,6 +40,7 @@ static scommand parse_scommand(Parser parser, bool *is_background, bool * is_pip
         // Si el primero argumento es un pipe o un & esta mal la sintaxis
         if(data == NULL && (*is_pipe || *is_background)) {
             fprintf(stderr, "Parsing error near '%s'\n", *is_background ? "&" : "|");
+            scommand_destroy(cmd);
             return NULL;
         }
         if (!(*is_background) && !(*is_pipe) && !parser_at_eof(parser)) {
@@ -89,7 +90,7 @@ pipeline parse_pipeline(Parser parser) {
             parser_skip_blanks(parser);
         } else {
             scommand_destroy(cmd);
-        } 
+        }
     } while (another_command);
 
 
