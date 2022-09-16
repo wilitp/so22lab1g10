@@ -5,6 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <wait.h>
+#include "tests/syscall_mock.h"
 
 #include "builtin.h"
 #include "execute.h"
@@ -41,7 +42,7 @@ static void in_out_redirs(scommand cmd, int *pipe_prev, int *pipe_next) {
 
     if ((fname_aux = scommand_get_redir_in(cmd))) {
         // Abrir archivo y asignar in
-        in = open(fname_aux, O_RDONLY);
+        in = open(fname_aux, O_RDONLY, 0);
         if (in < 0) {
         } else {
             dup2(in, STDIN_FILENO);
