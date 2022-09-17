@@ -5,10 +5,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <wait.h>
-#include "tests/syscall_mock.h"
 
 #include "builtin.h"
 #include "execute.h"
+#include "tests/syscall_mock.h"
 
 static char **free_arg_array(char **arr, unsigned int argc) {
     for (unsigned int i = 0; i < argc; ++i) {
@@ -63,10 +63,8 @@ static void in_out_redirs(scommand cmd, int *pipe_prev, int *pipe_next) {
 }
 
 static int execute_command(scommand cmd, int last_pipe_out, bool is_first,
-                           bool is_last) {
+                           bool is_last, int *cpid) {
     int pipefd[2];
-
-    int cpid;
 
     // Si no es el ultimo, creamos una pipe
     if (!is_last && pipe(pipefd) < 0) {
@@ -75,7 +73,7 @@ static int execute_command(scommand cmd, int last_pipe_out, bool is_first,
 
     // Hijo
 
-    if (0 == (cpid = fork())) {
+    if (0 == (*cpid = fork())) {
 
         // Redireccion
         in_out_redirs(cmd, !is_first ? &last_pipe_out : NULL,
@@ -116,22 +114,44 @@ static int execute_command(scommand cmd, int last_pipe_out, bool is_first,
 
 void execute_pipeline(pipeline apipe) {
 
+    // Eliminar zombies de pipelines en background anteriores
+    while(waitpid(-1, NULL, WNOHANG) > 0);
+
     // El fd de lectura del pipe abierto para el comando anterior
     int last_pipe_out;
 
     bool is_first = true;
 
     unsigned int plen = pipeline_length(apipe);
+
+    // si es un comando bulitin lo ejecutamos en el mismo proceso
+    if (builtin_alone(apipe)) {
+        builtin_run(pipeline_front(apipe));
+        return;
+    }
+
+    // Array de pid's para luego esperar a los procesos hijos
+    const unsigned int cpidc = plen;
+    int *cpids = calloc(plen, sizeof(int));
+
     do {
         scommand cmd = pipeline_front(apipe);
 
         // Ejecutar el comando y guardar la salida pipeada
-        last_pipe_out =
-            execute_command(cmd, last_pipe_out, is_first, plen == 1);
+        // Como ultimo argumento le paso el puntero del ultimo pid(este puntero va decreciendo)
+        last_pipe_out = execute_command(cmd, last_pipe_out, is_first, plen == 1,
+                                        &cpids[plen - 1]);
 
         pipeline_pop_front(apipe);
         --plen;
         is_first = false;
     } while (pipeline_length(apipe));
-    while(waitpid(-1, NULL, 0) > 0);
+
+    // Espero a los procesos hijos si es necesario
+    if (pipeline_get_wait(apipe)) {
+        for (unsigned int i = 0; i < cpidc; ++i) {
+            waitpid(cpids[i], NULL, 0);
+        }
+    }
+    free(cpids);
 }
