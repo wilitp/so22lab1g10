@@ -99,7 +99,9 @@ pipeline parse_pipeline(Parser parser) {
     pipeline_set_wait(result, !is_background);
 
     if(pipeline_is_empty(result)) {
+        pipeline_destroy(result);
         clean_garbage(parser, true); 
+        result = NULL;
     }
 
     return result;
