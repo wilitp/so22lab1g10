@@ -12,18 +12,21 @@
 #include "parsing.h"
 #include "prompt.h"
 
-int main(int argc, char *argv[]) {
+int main( void ) {
+    
+    Parser input = parser_new(stdin);
 
-    pipeline pipe;
-    Parser input;
-    bool quit = false;
-
-    input = parser_new(stdin);
+    if (input == NULL) {
+        perror("Error inicializando el Parser\n");
+        exit(EXIT_FAILURE);
+    }
+    
     bool end_of_line;
+    bool quit = false;
     while (!quit) {
         show_prompt();
         do {
-            pipe = parse_pipeline(input);
+            pipeline pipe = parse_pipeline(input);
             if (!(end_of_line = (pipe == NULL))) {
                 // Loguear lo parseado
                 // char *pstr = pipeline_to_string(pipe);

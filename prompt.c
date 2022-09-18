@@ -31,15 +31,14 @@ void show_prompt(void) {
     char work_dir[MAX_WORK_DIR_LENGTH];
     getcwd(work_dir, MAX_WORK_DIR_LENGTH);
 
-    // "username:work_dir$ »"
+    // print actual prompt
     printf("(my_bash) ");
     color_green();
     printf("%s:", username);
     color_blue();
-    printf("%s ", work_dir);
-    // printf(" 〉");
-    // printf("%c ", 0x21c9);
+    printf("%s", work_dir);
     color_reset();
+    printf("$ ");
     fflush(stdout);
 }
 
