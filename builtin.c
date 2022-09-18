@@ -6,6 +6,7 @@
 #include <unistd.h> // chdir
 
 #include "builtin.h"
+#include "tests/syscall_mock.h"
 #include "command.h"
 
 static bool is_cd(scommand cmd) {
