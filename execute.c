@@ -47,18 +47,23 @@ static void in_out_redirs(scommand cmd, int *pipe_prev, int *pipe_next) {
         } else {
             dup2(in, STDIN_FILENO);
         }
+        close(in);
     } else if (pipe_prev) {
         in = *pipe_prev;
         dup2(in, STDIN_FILENO);
+        close(in);
+
     }
 
     if ((fname_aux = scommand_get_redir_out(cmd))) {
         // Abrir archivo y asignar in
         out = open(fname_aux, O_WRONLY | O_CREAT, 0666);
         dup2(out, STDOUT_FILENO);
+        close(out);
     } else if (pipe_next) {
         out = *pipe_next;
         dup2(out, STDOUT_FILENO);
+        close(out);
     }
 }
 
@@ -74,6 +79,11 @@ static int execute_command(scommand cmd, int last_pipe_out, bool is_first,
     // Hijo
 
     if (0 == (*cpid = fork())) {
+
+        // Cerrar el fd de lectura(solo le interesa al padre)
+        if(!is_last) {
+            close(pipefd[0]);
+        }
 
         // Redireccion
         in_out_redirs(cmd, !is_first ? &last_pipe_out : NULL,
@@ -114,8 +124,6 @@ static int execute_command(scommand cmd, int last_pipe_out, bool is_first,
 
 void execute_pipeline(pipeline apipe) {
 
-    // Eliminar zombies de pipelines en background anteriores
-    while(waitpid(-1, NULL, WNOHANG) > 0);
 
     // El fd de lectura del pipe abierto para el comando anterior
     int last_pipe_out;
@@ -123,6 +131,10 @@ void execute_pipeline(pipeline apipe) {
     bool is_first = true;
 
     unsigned int plen = pipeline_length(apipe);
+
+    if (pipeline_is_empty(apipe)) {
+        return;
+    }
 
     // si es un comando bulitin lo ejecutamos en el mismo proceso
     if (builtin_alone(apipe)) {
@@ -138,9 +150,9 @@ void execute_pipeline(pipeline apipe) {
         scommand cmd = pipeline_front(apipe);
 
         // Ejecutar el comando y guardar la salida pipeada
-        // Como ultimo argumento le paso el puntero del ultimo pid(este puntero va decreciendo)
+        // Como ultimo argumento le paso el puntero del ultimo pid
         last_pipe_out = execute_command(cmd, last_pipe_out, is_first, plen == 1,
-                                        &cpids[plen - 1]);
+                                        &cpids[cpidc - plen]);
 
         pipeline_pop_front(apipe);
         --plen;
