@@ -10,6 +10,7 @@
 #include "execute.h"
 #include "tests/syscall_mock.h"
 
+// Destruye un array de strings
 static char **free_arg_array(char **arr, unsigned int argc) {
     for (unsigned int i = 0; i < argc; ++i) {
         free(arr[i]);
@@ -18,10 +19,11 @@ static char **free_arg_array(char **arr, unsigned int argc) {
     return arr = NULL;
 }
 
+// Construye un array a partir de un comando
 static char **arg_array(scommand cmd, unsigned int argc) {
 
-    char **argv = calloc((argc + 1), sizeof(char *));
-    argv[argc] = NULL; // argv es null terminated
+    char **argv = (char **) calloc((argc + 1), sizeof(char *));
+    argv[argc] = NULL; // argv es null terminated (requisito de execvp)
 
     for (unsigned i = 0; i < argc; ++i) {
         argv[i] = strdup(scommand_front(cmd));
@@ -30,36 +32,47 @@ static char **arg_array(scommand cmd, unsigned int argc) {
     return argv;
 }
 
-/* Se encarga de la redireccion de input y output, ya sean
+/* Se encarga de la redireccion de input y output
  * SOLO DEBE LLAMARSE DESDE UN PROCESO HIJO
  */
-static void in_out_redirs(scommand cmd, int *pipe_prev, int *pipe_next) {
-
-    // Variable auxiliar para los nombres de los archivos
-    char *fname_aux = NULL;
+static void in_out_redirs(scommand cmd, const int *pipe_prev, const int *pipe_next) {
 
     int in, out;
 
-    if ((fname_aux = scommand_get_redir_in(cmd))) {
+    // fname_aux: Variable auxiliar para los nombres de los archivos
+    char *fname_aux = scommand_get_redir_in(cmd);
+    if (fname_aux != NULL) {
         // Abrir archivo y asignar in
+        // O_RDONLY: read-only
         in = open(fname_aux, O_RDONLY, 0);
         if (in < 0) {
+            perror("No se pudo abrir el archivo de entrada");
         } else {
+            // dup2(fd1, fd2): copia en fd2 fd1
             dup2(in, STDIN_FILENO);
         }
         close(in);
+    // pipe_prev: de donde tiene que leer este comando
     } else if (pipe_prev) {
         in = *pipe_prev;
         dup2(in, STDIN_FILENO);
         close(in);
 
     }
+    fname_aux = scommand_get_redir_out(cmd);
 
-    if ((fname_aux = scommand_get_redir_out(cmd))) {
-        // Abrir archivo y asignar in
+    if (fname_aux != NULL) {
+        // Abrir archivo y asignar out
+        // O_WRONLY: write-only
+        // O_CREAT:  si el pathname no existe, lo crea
+        // 0666:     permisos
         out = open(fname_aux, O_WRONLY | O_CREAT, 0666);
+        if (out < 0) {
+            perror("No se pudo abrir el archivo de salida");
+        }
         dup2(out, STDOUT_FILENO);
         close(out);
+    // pipe_next: a donde tiene que escribir este comando
     } else if (pipe_next) {
         out = *pipe_next;
         dup2(out, STDOUT_FILENO);
@@ -67,26 +80,32 @@ static void in_out_redirs(scommand cmd, int *pipe_prev, int *pipe_next) {
     }
 }
 
-static int execute_command(scommand cmd, int last_pipe_out, bool is_first,
-                           bool is_last, int *cpid) {
+static int execute_command(scommand cmd, int last_pipe_out, bool is_first, bool is_last, int *cpid) {
+
+    // pipe file descriptor
+    // pipefd -> [0: lectura, 1: escritura]
     int pipefd[2];
 
     // Si no es el ultimo, creamos una pipe
-    if (!is_last && pipe(pipefd) < 0) {
+    if (!is_last && (pipe(pipefd) < 0)) {
         exit(1);
     }
+    
+    *cpid = fork();
+
+    // Error
+    if (*cpid < 0) {
+        perror("Fork error");
 
     // Hijo
-
-    if (0 == (*cpid = fork())) {
-
-        // Cerrar el fd de lectura(solo le interesa al padre)
+    } else if (*cpid == 0) {
+        // Cerrar el fd de lectura (solo le interesa al padre)
         if(!is_last) {
             close(pipefd[0]);
         }
 
         // Redireccion
-        in_out_redirs(cmd, !is_first ? &last_pipe_out : NULL,
+        in_out_redirs(cmd, !is_first ? &last_pipe_out : NULL, 
                       !is_last ? &pipefd[1] : NULL);
 
         // Ejecutar comando
@@ -105,7 +124,7 @@ static int execute_command(scommand cmd, int last_pipe_out, bool is_first,
             argv = free_arg_array(argv, argc);
         }
 
-        // Padre
+    // Padre
     } else {
 
         /* Cerrar los archivos de escritura del comando anterior
@@ -144,7 +163,7 @@ void execute_pipeline(pipeline apipe) {
 
     // Array de pid's para luego esperar a los procesos hijos
     const unsigned int cpidc = plen;
-    int *cpids = calloc(plen, sizeof(int));
+    int *cpids = (int *) calloc(plen, sizeof(int));
 
     do {
         scommand cmd = pipeline_front(apipe);
