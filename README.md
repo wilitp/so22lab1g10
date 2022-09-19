@@ -14,52 +14,61 @@
 
 Para compilar el codigo y crear un ejecutable con nombre mybash 
 
->       $ make
-
+```bash
+$ make
+```
 
 Para borrar los archivos objets y el ejecutable
 
->       $ make clean
-
+```bash
+$ make clean
+```
 
 Para correr el programa se puede ejecutar
 
->       $ make run
-
+```bash
+$ make run
+```
 
 ó podemos llamar al ejecutables directamente, luego de haber [compilado](#comp)
 
->       $ ./mybash
-
+```bash
+$ ./mybash
+```
 
 <br>
 #### Debugger
 
-Para debuggear el sistema lo haremos con la erramienta valgrind a travez del comando
+Para debuggear el sistema lo haremos con la herramienta valgrind a traves del comando
 
->       $ make debugger
-
+```bash
+$ make debugger
+```
 
 ó directamente corriendo ejecutando el valgrind, luego de haber [compilado](#comp)
 
->       $ valgrind ./mybash
+```bash
+$ valgrind ./mybash
+```
 
+Para correr los test al programa, se ejecuta el siguiente codigo
 
+```bash
+$ make test
+```
 
 
 <br>
 ####  Lista de comandos ya probados:
 
-<blockquote>
-
-    $ ls -l | grep -v
-    $ ls -l | wc -l > prueba.txt 
-    $ curl -o google.html google.com | grep moved & 
-    $ errorerror 
-    $ clear 
-    $ exit 
-
-</blockquote>
+```bash
+$ ls -l | grep -v
+$ ls -l | wc -l > prueba.txt 
+$ curl -o google.html google.com | grep moved & 
+$ errorerror 
+$ clear 
+$ exit 
+```
 
 
 
@@ -69,25 +78,24 @@ Para debuggear el sistema lo haremos con la erramienta valgrind a travez del com
 ##### Mybash:
 
 - muestra el prompt y usa [parcepipeline]() para consumir toda una linea
-- cada vez que parcea una pipe la ejecuta en el [execute]() en un proceso hijo
-- luego de ejecutarla, de ser necesario, la espera y limpia los procesos zombies
+- cada vez que parsea una pipe la ejecuta en el [execute]() 
 
 ##### Execute:
 
-- Ejecutar
-        
-    - poseemos dos comandos referidos a ejecurtar pipelines o comandos los cuales
-    - execute_pipeline ejecuta los comandos de una pipe conectando la salida de un comando con el siguiente
-        
-    - y execute_command los ejecuta en paralelo a los comandos de una pipe
-    - ejecuta un comando simple y devuelve su file descriptor de su output
+- poseemos dos comandos referidos a ejecurtar pipelines o comandos los cuales
 
-    - Redireccion
-        setea el standar_input y standar_output de cada comando segun corresponda
+- execute_pipeline ejecuta los comandos de una pipe conectando la salida de un comando con el siguiente
 
-    - Funciones con respecto al array
-        definimos una funcion que convierte los argumentos de un comando a un array
-        y otra funcion la cual los libera
+- y execute_command los ejecuta en paralelo a los comandos de una pipe
+
+- ejecuta un comando simple y devuelve su     file descriptor de su output
+
+- Redireccion
+    setea el standar_input y standar_output de cada comando segun corresponda
+
+- Funciones con respecto al array
+    definimos una funcion que convierte los argumentos de un comando a un array
+    y otra funcion la cual los libera
 
 ##### Parsing
 
@@ -105,7 +113,7 @@ Para debuggear el sistema lo haremos con la erramienta valgrind a travez del com
 
 ##### Builtin
 
-- [x] implementa tres comandos internos: cd, exit y help
+- implementa tres comandos internos: cd, exit y help
 - expone funciones para determinar si un comando es interno o no
 - se encarga de la ejecucion de los determinado comandos internos
 
@@ -125,7 +133,7 @@ Para debuggear el sistema lo haremos con la erramienta valgrind a travez del com
 - listas
     para las listas en ambos tipos, usamos [GLists](https://docs.gtk.org/glib/struct.List.html) de la libreria Glib
 
-##### Implementacion de comandos personales 
+##### Funciones modularizadas 
 
 - En execute
     - [in_out_redirs]()
@@ -133,19 +141,38 @@ Para debuggear el sistema lo haremos con la erramienta valgrind a travez del com
     - [free_arg_array]()
     - [execute_command]()
 
+- En parsing
+    - [parse_scomand]()
+    - [clean_garbage]()
+
+#### Jerarquía de procesos
+
+- Generamos porcesos hijos para cada comando simple de una pipeline
+- Conectamos sus salidas y sus entradas a travez de pipes
+- Execute_pipeline trackea los pids de dichos procesos para esperarlos a todos si el pipeline esta seteado como foreground
+- En cada impresion del prompt, eliminamos todos los procesos zombies hasta ese momento (producto de haber ejecutado pipelines en background) 
+
 <br>
 ####  Items relevante:
 
-<br>
-####  Extra: nuestra forma de trabajar
-
-- [ ] Manejamos un sistema de control de verciones: [Bitbucket](https://bitbucket.org/)
-- [ ] Nos manejamos a travez de ramas (branchs) propias de cada tarea por hacer (normalmente distribuidas por archivos)
-- [ ] Comunicación: Grupo de [WhatsApp](https://web.whatsapp.com/)
 
 
 <br>
+####  Nuestra forma de trabajar
+
+- Manejamos un sistema de control de versiones: [Bitbucket](https://bitbucket.org/)
+- Nos manejamos a travez de ramas (branchs) propias de cada tarea por hacer (normalmente distribuidas por archivos)
+- Comunicación: Grupo de [WhatsApp](https://web.whatsapp.com/)
+
+<br>
+####  Extras:
+
+- Generalizar el comando pipeline “|” a una cantidad arbitraria de comandos simples
+- Imprimir un prompt con información relevante: nombre del host, nombre de usuario y camino absoluto.
+- Ejecutar una cantidad arbitraria de pipelines por linea (separados por "&")
+
+<br>	
 <br>
 
-![This is an image](https://www.famaf.unc.edu.ar/static/assets/logosFooterBottom.svg)
+![FAMAF](https://www.famaf.unc.edu.ar/static/assets/logosFooterBottom.svg)
 
