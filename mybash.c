@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <wait.h>
 
 #include "builtin.h"
 #include "command.h"
@@ -25,6 +26,8 @@ int main( void ) {
     bool quit = false;
     while (!quit) {
         show_prompt();
+        while(waitpid(-1, NULL, WNOHANG) > 0);
+
         do {
             pipeline pipe = parse_pipeline(input);
             if (!(end_of_line = (pipe == NULL))) {
