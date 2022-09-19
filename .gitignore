@@ -1,6 +1,7 @@
 strextra.o
 mybash.o
 parsing.o
+*.o
 mybash
 .depend
 .ccls*
