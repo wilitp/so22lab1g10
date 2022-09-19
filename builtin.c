@@ -46,7 +46,8 @@ void builtin_run(scommand cmd) {
     } else if (is_cd(cmd)) {
         
         if (scommand_length(cmd) <= 1) {
-            printf("Faltan argumentos\n");
+            char *homedir = getenv("HOME");
+            chdir(homedir);
         } else {
             scommand_pop_front(cmd);                    // consumo el 'cd'
             
