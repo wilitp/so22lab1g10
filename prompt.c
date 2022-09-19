@@ -29,12 +29,20 @@ void show_prompt(void) {
 
     // work directory
     char work_dir[MAX_WORK_DIR_LENGTH];
+    work_dir[MAX_WORK_DIR_LENGTH-1] = '\0'; // El último caracter es NULL
     getcwd(work_dir, MAX_WORK_DIR_LENGTH);
+        
+    char host_name[MAX_HOST_LENGTH];
+    host_name[MAX_HOST_LENGTH-1] = '\0'; // El último caracter es NULL
+    gethostname(host_name, MAX_HOST_LENGTH);
+
 
     // print actual prompt
     printf("(my_bash) ");
     color_green();
-    printf("%s:", username);
+    printf("%s@%s", username, host_name);
+    color_reset();
+    printf(":");
     color_blue();
     printf("%s", work_dir);
     color_reset();
