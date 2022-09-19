@@ -77,10 +77,10 @@ $ exit
 
 ##### Mybash:
 
-- muestra el prompt y usa [parcepipeline]() para consumir toda una linea
-- cada vez que parsea una pipe la ejecuta en el [execute]() 
+- muestra el prompt y usa parcepipeline para consumir toda una linea
+- cada vez que parsea una pipe la ejecuta en el execute
 
-##### Execute:
+<h5 id="exec">Execute: </h5> 
 
 - poseemos dos comandos referidos a ejecurtar pipelines o comandos los cuales
 
@@ -97,7 +97,7 @@ $ exit
     definimos una funcion que convierte los argumentos de un comando a un array
     y otra funcion la cual los libera
 
-##### Parsing
+<h5 id="pars">Parsing: </h5> 
 
 - Parsear un comando
     - usa el parser para leer el siguiente argumento hasta encontrarse con un pipe(|), un amperson(&) o no tener mas que leer (\n)
@@ -136,14 +136,14 @@ $ exit
 ##### Funciones modularizadas 
 
 - En execute
-    - [in_out_redirs]()
-    - [arg_array]()
-    - [free_arg_array]()
-    - [execute_command]()
+    - [in_out_redirs](#exec)
+    - [arg_array](#exec)
+    - [free_arg_array](#exec)
+    - [execute_command](#exec)
 
 - En parsing
-    - [parse_scomand]()
-    - [clean_garbage]()
+    - [parse_scomand](#pars)
+    - [clean_garbage](#pars)
 
 #### Jerarquía de procesos
 
@@ -165,7 +165,7 @@ $ exit
 - Comunicación: Grupo de [WhatsApp](https://web.whatsapp.com/)
 
 <br>
-####  Extras:
+####  Extras - Puntos estrellas:
 
 - Generalizar el comando pipeline “|” a una cantidad arbitraria de comandos simples
 - Imprimir un prompt con información relevante: nombre del host, nombre de usuario y camino absoluto.
