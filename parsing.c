@@ -69,14 +69,12 @@ pipeline parse_pipeline(Parser parser) {
     pipeline result = pipeline_new();
     bool is_background = false;
     bool another_command = false;
-    bool error;
 
     do {
         // Leemos un comando
         bool cmd_bg, another_cmd; // Aux por si hay un error al leer
         scommand cmd = parse_scommand(parser, &cmd_bg, &another_cmd);
-        error = (cmd == NULL);
-        if(error){
+        if(cmd == NULL){
             pipeline_destroy(result);
             // Limpio toda la linea que dio error de parseo
             clean_garbage(parser, false);
